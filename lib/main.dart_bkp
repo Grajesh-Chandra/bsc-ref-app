@@ -1,0 +1,439 @@
+import 'package:flutter/material.dart';
+
+void main() {
+  runApp(const TrustScreenApp());
+}
+
+class TrustScreenApp extends StatelessWidget {
+  const TrustScreenApp({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'Affinidi Reference App',
+      theme: ThemeData(
+        primaryColor: const Color(0xFF1E3A8A),
+        useMaterial3: true,
+        textTheme: const TextTheme(
+          headlineLarge: TextStyle(
+              fontSize: 48, fontWeight: FontWeight.bold, color: Colors.white),
+          headlineMedium: TextStyle(
+              fontSize: 24,
+              fontWeight: FontWeight.bold,
+              color: Color(0xFF60A5FA)),
+          bodyLarge: TextStyle(fontSize: 16, color: Colors.white),
+          bodyMedium: TextStyle(fontSize: 14, color: Colors.white70),
+          titleLarge: TextStyle(
+              fontSize: 20, fontWeight: FontWeight.bold, color: Colors.black87),
+        ),
+      ),
+      home: const HomePage(),
+    );
+  }
+}
+
+class HomePage extends StatelessWidget {
+  const HomePage({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: SingleChildScrollView(
+        child: Column(
+          children: [
+            // Header
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+              color: Colors.white,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Text(
+                    'Affinidi Reference App',
+                    style: TextStyle(
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                      color: Color(0xFF1E3A8A),
+                    ),
+                  ),
+                  Row(
+                    children: [
+                      _buildNavLink(context, 'About Us'),
+                      _buildNavLink(context, 'Verification'),
+                      _buildNavLink(context, 'Reports'),
+                      _buildNavLink(context, 'Contact Us'),
+                      _buildNavLink(context, 'Testimonials'),
+                      _buildNavLink(context, 'Profile'),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+            // Main Section
+            Container(
+              decoration: const BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [Color(0xFF1E3A8A), Color(0xFF0F172A)],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                ),
+              ),
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 48),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Left: Headline and Tagline
+                  Expanded(
+                    flex: 2,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        RichText(
+                          text: const TextSpan(
+                            children: [
+                              TextSpan(
+                                text: 'Talents are costly\n',
+                                style: TextStyle(
+                                    fontSize: 48,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.white),
+                              ),
+                              TextSpan(
+                                text: 'Verifications shouldn\'t be.',
+                                style: TextStyle(
+                                    fontSize: 48,
+                                    fontWeight: FontWeight.bold,
+                                    color: Color(0xFF60A5FA)),
+                              ),
+                              TextSpan(
+                                text:
+                                    '\n\nGet started with Affinidi Element Stack and Developer Tools today.\n',
+                                style: TextStyle(
+                                    fontSize: 24,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.white),
+                              ),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+                        const Text(
+                          'Secure Proof® Background Checks screen employees in 24 hours – with precision, speed, and reliability.',
+                          style: TextStyle(fontSize: 16, color: Colors.white70),
+                        ),
+                        const SizedBox(height: 24),
+                        OutlinedButton.icon(
+                          onPressed: () {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(content: Text('Opening WhatsApp')),
+                            );
+                          },
+                          icon: const Icon(Icons.chat, color: Colors.white),
+                          label: const Text('WhatsApp Us',
+                              style: TextStyle(color: Colors.white)),
+                          style: OutlinedButton.styleFrom(
+                            side: const BorderSide(color: Colors.white),
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 16, vertical: 8),
+                          ),
+                        ),
+                        const SizedBox(height: 32),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(width: 48),
+                  // Right: Get Started Form
+                  Expanded(
+                    flex: 1,
+                    child: Container(
+                      padding: const EdgeInsets.all(24),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Text(
+                            'Get Started Today',
+                            style: TextStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.black87),
+                          ),
+                          const SizedBox(height: 16),
+                          const _FormField(
+                              label: 'Full Name', hint: 'Your name'),
+                          const _FormField(
+                              label: 'Company Name', hint: 'Your company'),
+                          const _FormField(
+                              label: 'Email Address', hint: 'you@example.com'),
+                          const _FormField(
+                              label: 'Phone Number', hint: 'Your phone number'),
+                          DropdownButtonFormField<String>(
+                            decoration: const InputDecoration(
+                              labelText: 'Service Needed',
+                              hintText: 'Select a service',
+                              border: OutlineInputBorder(),
+                            ),
+                            items: const [
+                              DropdownMenuItem(
+                                  value: 'background_check',
+                                  child: Text('Background Check')),
+                              DropdownMenuItem(
+                                  value: 'reference_check',
+                                  child: Text('Reference Check')),
+                              DropdownMenuItem(
+                                  value: 'education_verification',
+                                  child: Text('Education Verification')),
+                              DropdownMenuItem(
+                                  value: 'employment_verification',
+                                  child: Text('Employment Verification')),
+                              DropdownMenuItem(
+                                  value: 'criminal_record_check',
+                                  child: Text('Criminal Record Check')),
+                              DropdownMenuItem(
+                                  value: 'identity_verification',
+                                  child: Text('Identity Verification')),
+                            ],
+                            onChanged: (value) {},
+                          ),
+                          const SizedBox(height: 16),
+                          ElevatedButton(
+                            onPressed: () {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(content: Text('Form submitted')),
+                              );
+                            },
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: const Color(0xFF1E3A8A),
+                              minimumSize: const Size(double.infinity, 48),
+                            ),
+                            child: const Text(
+                              'Begin Screening Now',
+                              style: TextStyle(color: Colors.white),
+                            ),
+                          ),
+                          const SizedBox(height: 8),
+                          const Text(
+                            'By submitting this form, you agree to our Terms of Service and Privacy Policy.',
+                            style: TextStyle(fontSize: 12, color: Colors.grey),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            // Footer Note
+            Container(
+              padding: const EdgeInsets.all(24),
+              color: Colors.white,
+              child: const Text(
+                'We Support All Industries Including IT, Pharma, BFSI, Logistics, Staffing, Apparel, Manufacturing, E-commerce, and more.',
+                style: TextStyle(fontSize: 14, color: Colors.black54),
+                textAlign: TextAlign.center,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildNavLink(BuildContext context, String title) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      child: TextButton(
+        onPressed: () {
+          if (title == 'Profile') {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const ProfilePage()),
+            );
+          } else {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text('Navigating to $title')),
+            );
+          }
+        },
+        child: Text(
+          title,
+          style: const TextStyle(color: Colors.black87),
+        ),
+      ),
+    );
+  }
+}
+
+// Profile Page
+class ProfilePage extends StatefulWidget {
+  const ProfilePage({super.key});
+
+  @override
+  State<ProfilePage> createState() => _ProfilePageState();
+}
+
+class _ProfilePageState extends State<ProfilePage> {
+  Map<String, String>? _walletDetails;
+
+  void _createWallet() {
+    // Simulate wallet creation with mock data
+    setState(() {
+      _walletDetails = {
+        'address':
+            '0x${DateTime.now().millisecondsSinceEpoch.toRadixString(16)}',
+        'createdOn': DateTime.now().toString(),
+      };
+    });
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Wallet created successfully')),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Profile'),
+        backgroundColor: const Color(0xFF1E3A8A),
+      ),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+              'Profile Information',
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 16),
+            Card(
+              elevation: 2,
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: const [
+                    _ProfileField(label: 'Name', value: 'User Name'),
+                    _ProfileField(
+                        label: 'Email', value: 'user@trustscreen.com'),
+                  ],
+                ),
+              ),
+            ),
+            const SizedBox(height: 24),
+            const Text(
+              'Wallet Management',
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 16),
+            ElevatedButton(
+              onPressed: _walletDetails == null ? _createWallet : null,
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFF1E3A8A),
+                minimumSize: const Size(double.infinity, 48),
+              ),
+              child: const Text(
+                'Create Wallet',
+                style: TextStyle(color: Colors.white),
+              ),
+            ),
+            if (_walletDetails != null) ...[
+              const SizedBox(height: 16),
+              Card(
+                elevation: 2,
+                child: Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      _ProfileField(
+                          label: 'Wallet Address',
+                          value: _walletDetails!['address']!),
+                      _ProfileField(
+                          label: 'Created On',
+                          value: _walletDetails!['createdOn']!),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+// Reused Components
+class MetricItem extends StatelessWidget {
+  final String title;
+  final String subtitle;
+
+  const MetricItem({super.key, required this.title, required this.subtitle});
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        Text(
+          title,
+          style: const TextStyle(
+              fontSize: 20, fontWeight: FontWeight.bold, color: Colors.white),
+        ),
+        const SizedBox(height: 4),
+        Text(
+          subtitle,
+          style: const TextStyle(fontSize: 14, color: Colors.white70),
+        ),
+      ],
+    );
+  }
+}
+
+class _FormField extends StatelessWidget {
+  final String label;
+  final String hint;
+
+  const _FormField({required this.label, required this.hint});
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 16),
+      child: TextFormField(
+        decoration: InputDecoration(
+          labelText: label,
+          hintText: hint,
+          border: const OutlineInputBorder(),
+        ),
+      ),
+    );
+  }
+}
+
+class _ProfileField extends StatelessWidget {
+  final String label;
+  final String value;
+
+  const _ProfileField({required this.label, required this.value});
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(label,
+              style:
+                  const TextStyle(fontSize: 16, fontWeight: FontWeight.w500)),
+          Text(value,
+              style: const TextStyle(fontSize: 16, color: Colors.black54)),
+        ],
+      ),
+    );
+  }
+}

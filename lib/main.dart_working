@@ -1,0 +1,2043 @@
+import 'package:flutter/material.dart';
+// import 'package:file_picker/file_picker.dart'; // Uncomment in a real Flutter project
+
+void main() {
+  runApp(const MyApp());
+}
+
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'Affinidi Reference App',
+      debugShowCheckedModeBanner: false, // Hide the debug banner
+      theme: ThemeData(
+        primarySwatch: Colors.blue,
+        fontFamily:
+            'Inter', // Assuming 'Inter' is the desired font, ensure it's available or use default
+      ),
+      home: const SplashScreen(), // Set SplashScreen as the initial home
+    );
+  }
+}
+
+// New Splash Screen Widget
+class SplashScreen extends StatefulWidget {
+  const SplashScreen({super.key});
+
+  @override
+  State<SplashScreen> createState() => _SplashScreenState();
+}
+
+class _SplashScreenState extends State<SplashScreen> {
+  bool _isLoading = false;
+
+  void _getStarted() async {
+    setState(() {
+      _isLoading = true;
+    });
+
+    // Simulate wallet creation and other details setup
+    debugPrint('Creating wallet and other details...');
+    await Future.delayed(
+        const Duration(seconds: 2)); // Simulate network/processing delay
+    debugPrint('Wallet and details created!');
+
+    if (mounted) {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const LandingPage()),
+      );
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final double screenWidth = MediaQuery.of(context).size.width;
+    final bool isLargeScreen = screenWidth > 900;
+
+    return Scaffold(
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            // Image for the splash screen
+            Image.asset(
+              'logo.png', // Placeholder image URL
+              width: isLargeScreen ? 200 : 150,
+              height: isLargeScreen ? 200 : 150,
+              errorBuilder: (context, error, stackTrace) => Container(
+                width: isLargeScreen ? 200 : 150,
+                height: isLargeScreen ? 200 : 150,
+                color: Colors.grey[200],
+                alignment: Alignment.center,
+                child:
+                    const Icon(Icons.image_not_supported, color: Colors.grey),
+              ),
+            ),
+            const SizedBox(height: 30),
+            Text(
+              'Affinidi Reference App',
+              style: TextStyle(
+                fontSize: isLargeScreen ? 48 : 32,
+                fontWeight: FontWeight.bold,
+                color: Colors.black87,
+              ),
+            ),
+            const SizedBox(height: 15),
+            Text(
+              'Welcome to the Affinidi Reference App',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: isLargeScreen ? 20 : 16,
+                color: Colors.black54,
+              ),
+            ),
+            const SizedBox(height: 30),
+
+            Text(
+              'Your secure identity and data management solution.',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: isLargeScreen ? 20 : 16,
+                color: Colors.black54,
+              ),
+            ),
+            const SizedBox(height: 50),
+            _isLoading
+                ? const CircularProgressIndicator(color: Colors.black)
+                : ElevatedButton(
+                    onPressed: _getStarted,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.black,
+                      padding: EdgeInsets.symmetric(
+                        horizontal: isLargeScreen ? 50 : 30,
+                        vertical: isLargeScreen ? 25 : 18,
+                      ),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                    ),
+                    child: Text(
+                      'Get Started',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: isLargeScreen ? 20 : 18,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class LandingPage extends StatelessWidget {
+  const LandingPage({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    // Get screen width to determine responsiveness
+    final double screenWidth = MediaQuery.of(context).size.width;
+    final bool isLargeScreen =
+        screenWidth > 900; // Define a breakpoint for large screens
+    final bool isMediumScreen = screenWidth > 600 && screenWidth <= 900;
+
+    return Scaffold(
+      // AppBar for navigation
+      appBar: AppBar(
+        backgroundColor: Colors.white,
+        elevation: 0, // No shadow
+        title: Padding(
+          padding:
+              EdgeInsets.symmetric(horizontal: isLargeScreen ? 80.0 : 20.0),
+          child: Row(
+            children: [
+              // Logo/Brand Name (responsive font size)
+              Text(
+                'Affinidi Reference App',
+                style: TextStyle(
+                  color: Colors.black,
+                  fontWeight: FontWeight.bold,
+                  fontSize: isLargeScreen ? 18 : 16, // Smaller font for mobile
+                ),
+              ),
+              const Spacer(), // Pushes navigation items/menu icon to the right
+              // Navigation items for large screens, or menu icon for smaller screens
+              if (isLargeScreen)
+                _buildNavBarItems(context)
+              else
+                Builder(
+                  builder: (context) => IconButton(
+                    icon: const Icon(Icons.menu, color: Colors.black),
+                    onPressed: () {
+                      Scaffold.of(context)
+                          .openEndDrawer(); // Open the drawer from the right
+                    },
+                  ),
+                ),
+            ],
+          ),
+        ),
+      ),
+      // Drawer for navigation on smaller screens
+      endDrawer: isLargeScreen ? null : _buildDrawer(context),
+      body: SingleChildScrollView(
+        child: Column(
+          children: <Widget>[
+            // Hero Section
+            _buildHeroSection(context, isLargeScreen, isMediumScreen),
+            // Stats Section
+            _buildStatsSection(isLargeScreen),
+            // Add more sections as needed (e.g., footer)
+            const SizedBox(height: 100), // Spacing at the bottom
+          ],
+        ),
+      ),
+    );
+  }
+
+  // Helper method to build navigation bar items for large screens
+  Widget _buildNavBarItems(BuildContext context) {
+    return Row(
+      children: [
+        _buildNavBarItem(context, 'Home'),
+        const SizedBox(width: 30),
+        _buildNavBarItem(context, 'Self-Screening'),
+        const SizedBox(width: 30),
+        _buildNavBarItem(context, 'Profile'),
+        const SizedBox(width: 30),
+        _buildNavBarItem(context, 'Contact Us'),
+        const SizedBox(width: 30),
+        _buildNavBarItem(context, 'About US'),
+      ],
+    );
+  }
+
+  // Helper method to build a single navigation item (button)
+  Widget _buildNavBarItem(BuildContext context, String text) {
+    return TextButton(
+      onPressed: () {
+        debugPrint('$text tapped');
+        if (text == 'Self-Screening') {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => const SelfScreeningPage()),
+          );
+        } else if (text == 'Profile') {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => const ProfilePage()),
+          );
+        }
+      },
+      child: Text(
+        text,
+        style: const TextStyle(
+          color: Colors.black54, // Lighter grey for navigation
+          fontSize: 16,
+        ),
+      ),
+    );
+  }
+
+  // Helper method to build the drawer for smaller screens
+  Widget _buildDrawer(BuildContext context) {
+    return Drawer(
+      child: ListView(
+        padding: EdgeInsets.zero,
+        children: <Widget>[
+          const DrawerHeader(
+            decoration: BoxDecoration(
+              color: Colors.black,
+            ),
+            child: Text(
+              'AFFINIDI', // Changed from CROSSCHECKS
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
+          _buildDrawerItem(context, 'Home'),
+          _buildDrawerItem(context, 'Self-Screening'),
+          _buildDrawerItem(context, 'Profile'),
+          _buildDrawerItem(context, 'About US'),
+          _buildDrawerItem(context, 'Contact Us'),
+        ],
+      ),
+    );
+  }
+
+  // Helper method to build a single drawer item
+  Widget _buildDrawerItem(BuildContext context, String text) {
+    return ListTile(
+      title: Text(text),
+      onTap: () {
+        debugPrint('$text tapped from drawer');
+        Navigator.pop(context); // Close the drawer first
+        if (text == 'Self-Screening') {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => const SelfScreeningPage()),
+          );
+        } else if (text == 'Profile') {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => const ProfilePage()),
+          );
+        }
+      },
+    );
+  }
+
+  // Helper method to build the Hero Section
+  Widget _buildHeroSection(
+      BuildContext context, bool isLargeScreen, bool isMediumScreen) {
+    return Padding(
+      padding: EdgeInsets.symmetric(
+        horizontal: isLargeScreen ? 100.0 : (isMediumScreen ? 50.0 : 20.0),
+        vertical: isLargeScreen ? 50.0 : 30.0,
+      ),
+      child: Flex(
+        // Using Flex for responsive layout (Row or Column)
+        direction: isLargeScreen ? Axis.horizontal : Axis.vertical,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          // Left side: Text content and button
+          Expanded(
+            flex: isLargeScreen
+                ? 3
+                : 1, // Give more space to text on large screens
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                Text(
+                  'From Data to\nDecisions',
+                  style: TextStyle(
+                    fontSize: isLargeScreen
+                        ? 60
+                        : (isMediumScreen ? 48 : 36), // Responsive font size
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black87,
+                    height: 1.1, // Adjust line height
+                  ),
+                ),
+                SizedBox(height: isLargeScreen ? 20 : 15),
+                Text(
+                  'Intelligent, Flexible Background Reporting Solutions',
+                  style: TextStyle(
+                    fontSize: isLargeScreen ? 20 : (isMediumScreen ? 18 : 16),
+                    color: Colors.black54,
+                  ),
+                ),
+                SizedBox(height: isLargeScreen ? 40 : 30),
+                ElevatedButton(
+                  onPressed: () {
+                    debugPrint('See Screening Bundle tapped');
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => const SelfScreeningPage()),
+                    );
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.black, // Button background color
+                    padding: EdgeInsets.symmetric(
+                      horizontal: isLargeScreen ? 40 : 30,
+                      vertical: isLargeScreen ? 20 : 15,
+                    ),
+                    shape: RoundedRectangleBorder(
+                      borderRadius:
+                          BorderRadius.circular(8), // Slightly rounded corners
+                    ),
+                  ),
+                  child: Text(
+                    'See Screening Bundle',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: isLargeScreen ? 18 : 16,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          SizedBox(
+              width: isLargeScreen ? 50 : 0,
+              height: isLargeScreen ? 0 : 30), // Spacing between sections
+          // Right side: Illustration image
+          Expanded(
+            flex:
+                isLargeScreen ? 2 : 1, // Less space for image on large screens
+            child: isLargeScreen
+                ? Image.asset(
+                    'assets/illustration.png',
+                    fit: BoxFit.contain,
+                    errorBuilder: (context, error, stackTrace) => Container(
+                      color: Colors.grey[200],
+                      alignment: Alignment.center,
+                      child: const Text('Image not found',
+                          style: TextStyle(color: Colors.grey)),
+                    ),
+                  )
+                : AspectRatio(
+                    // Added AspectRatio for mobile view to constrain height
+                    aspectRatio: 16 / 9, // Adjust as needed for your image
+                    child: Image.asset(
+                      'assets/illustration.png',
+                      fit: BoxFit.contain,
+                      errorBuilder: (context, error, stackTrace) => Container(
+                        color: Colors.grey[200],
+                        alignment: Alignment.center,
+                        child: const Text('Image not found',
+                            style: TextStyle(color: Colors.grey)),
+                      ),
+                    ),
+                  ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // Helper method to build the Stats Section
+  Widget _buildStatsSection(bool isLargeScreen) {
+    return Padding(
+      padding: EdgeInsets.symmetric(
+        horizontal: isLargeScreen ? 100.0 : 20.0,
+        vertical: isLargeScreen ? 50.0 : 30.0,
+      ),
+      child: Flex(
+        // Using Flex for responsive layout (Row or Column)
+        direction: isLargeScreen ? Axis.horizontal : Axis.vertical,
+        mainAxisAlignment:
+            isLargeScreen ? MainAxisAlignment.start : MainAxisAlignment.center,
+        children: <Widget>[
+          _buildStatItem('45+', 'Background\nCheck Services', isLargeScreen),
+          SizedBox(
+              width: isLargeScreen ? 80 : 0,
+              height: isLargeScreen ? 0 : 30), // Spacing between stats
+          _buildStatItem('1M+', 'Verified\nemployee', isLargeScreen),
+        ],
+      ),
+    );
+  }
+
+  // Helper method to build a single stat item
+  Widget _buildStatItem(String number, String description, bool isLargeScreen) {
+    return Column(
+      crossAxisAlignment:
+          isLargeScreen ? CrossAxisAlignment.start : CrossAxisAlignment.center,
+      children: <Widget>[
+        Text(
+          number,
+          style: TextStyle(
+            fontSize: isLargeScreen ? 48 : 36,
+            fontWeight: FontWeight.bold,
+            color: Colors.black87,
+          ),
+        ),
+        Text(
+          description,
+          textAlign: isLargeScreen ? TextAlign.left : TextAlign.center,
+          style: TextStyle(
+            fontSize: isLargeScreen ? 18 : 16,
+            color: Colors.black54,
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+// New page to display self-screening bundles
+class SelfScreeningPage extends StatelessWidget {
+  const SelfScreeningPage({super.key});
+
+  final List<Map<String, dynamic>> bundles = const [
+    {
+      'title': 'Background Verification Bundle',
+      'description':
+          'Background verification is a crucial step in the hiring process. Our self-screening bundle allows you to verify your background and share it with potential employers. This not only speeds up the hiring process but also builds trust with your future employer.',
+      'buttonText': 'Get Bundle',
+      'price': 49.80,
+      'required_documents': [
+        {
+          'service': 'ID Verification',
+          'documents': ['Passport', 'NCSBN ID']
+        },
+        {
+          'service': 'Drug Test',
+          'documents': [
+            '10-Panel Test',
+            'Vaccination Records',
+            'Physical Examination Form'
+          ]
+        },
+        {
+          'service': 'Reference Checks',
+          'documents': ['Reference Letter']
+        },
+        {
+          'service': 'Employment History',
+          'documents': ['Resume', 'Offer Letter', 'Pay Stubs']
+        },
+      ],
+    },
+    {
+      'title': 'Identity Verification Bundle',
+      'description':
+          'Identity verification is a crucial step in the hiring process. Our self-screening bundle allows you to verify your identity and share it with potential employers. This not only speeds up the hiring process but also builds trust with your future employer.',
+      'buttonText': 'Get Bundle',
+      'price': 35.00,
+      'required_documents': [
+        {
+          'service': 'ID Verification',
+          'documents': ['Passport', 'National ID Card']
+        },
+        {
+          'service': 'Proof of Address',
+          'documents': ['Utility Bill', 'Bank Statement']
+        },
+      ],
+    },
+    {
+      'title': 'Employment Verification Bundle',
+      'description':
+          'Employment verification is a crucial step in the hiring process. Our self-screening bundle allows you to verify your employment history and share it with potential employers. This not only speeds up the hiring process but also builds trust with your future employer.',
+      'buttonText': 'Get Bundle',
+      'price': 25.50,
+      'required_documents': [
+        {
+          'service': 'Employment History',
+          'documents': [
+            'Previous Employer Contact',
+            'Dates of Employment',
+            'Job Title Confirmation'
+          ]
+        },
+      ],
+    },
+    {
+      'title': 'Education Verification Bundle',
+      'description':
+          'Education verification is a crucial step in the hiring process. Our self-screening bundle allows you to verify your educational background and share it with potential employers. This not only speeds up the hiring process but also builds trust with your future employer.',
+      'buttonText': 'Get Bundle',
+      'price': 20.00,
+      'required_documents': [
+        {
+          'service': 'Education Credentials',
+          'documents': [
+            'Degree Confirmation',
+            'Institution Accreditation',
+            'Dates of Attendance'
+          ]
+        },
+      ],
+    },
+    {
+      'title': 'Criminal Record Check Bundle',
+      'description':
+          'Criminal record checks are a crucial step in the hiring process. Our self-screening bundle allows you to check your criminal record and share it with potential employers. This not only speeds up the hiring process but also builds trust with your future employer.',
+      'buttonText': 'Get Bundle',
+      'price': 55.00,
+      'required_documents': [
+        {
+          'service': 'Criminal Records',
+          'documents': [
+            'National Criminal Database',
+            'Sex Offender Registry',
+            'Federal Criminal Records'
+          ]
+        },
+      ],
+    },
+    {
+      'title': 'Credit Check Bundle',
+      'description':
+          'Credit checks are a crucial step in the hiring process. Our self-screening bundle allows you to check your credit history and share it with potential employers. This not only speeds up the hiring process but also builds trust with your future employer.',
+      'buttonText': 'Get Bundle',
+      'price': 30.00,
+      'required_documents': [
+        {
+          'service': 'Credit History',
+          'documents': [
+            'Credit Score Report',
+            'Payment History',
+            'Public Records (Bankruptcy, Liens)'
+          ]
+        },
+      ],
+    },
+    {
+      'title': 'Reference Check Bundle',
+      'description':
+          'Reference checks are a crucial step in the hiring process. Our self-screening bundle allows you to check your references and share it with potential employers. This not only speeds up the hiring process but also builds trust with your future employer.',
+      'buttonText': 'Get Bundle',
+      'price': 40.00,
+      'required_documents': [
+        {
+          'service': 'References',
+          'documents': [
+            'Professional Reference Contact Info',
+            'Personal Reference Contact Info'
+          ]
+        },
+      ],
+    },
+    {
+      'title': 'Drug Test Bundle',
+      'description':
+          'Drug tests are a crucial step in the hiring process. Our self-screening bundle allows you to take a drug test and share it with potential employers. This not only speeds up the hiring process but also builds trust with your future employer.',
+      'buttonText': 'Get Bundle',
+      'price': 60.00,
+      'required_documents': [
+        {
+          'service': 'Drug Test Results',
+          'documents': ['5-Panel Drug Test Report', '10-Panel Drug Test Report']
+        },
+      ],
+    },
+    {
+      'title': 'Driving Record Check Bundle',
+      'description':
+          'Driving record checks are a crucial step in the hiring process. Our self-screening bundle allows you to check your driving record and share it with potential employers. This not only speeds up the hiring process but also builds trust with your future employer.',
+      'buttonText': 'Get Bundle',
+      'price': 22.00,
+      'required_documents': [
+        {
+          'service': 'Driving Records',
+          'documents': [
+            'Motor Vehicle Report (MVR)',
+            'Driver\'s License Status'
+          ]
+        },
+      ],
+    },
+    {
+      'title': 'Social Media Check Bundle',
+      'description':
+          'Social media checks are a crucial step in the hiring process. Our self-screening bundle allows you to check your social media presence and share it with potential employers. This not only speeds up the hiring process but also builds trust with your future employer.',
+      'buttonText': 'Get Bundle',
+      'price': 28.00,
+      'required_documents': [
+        {
+          'service': 'Social Media Presence',
+          'documents': [
+            'Public Social Media Profiles',
+            'Negative Content Identification'
+          ]
+        },
+      ],
+    },
+    {
+      'title': 'Professional License Check Bundle',
+      'description':
+          'Professional license checks are a crucial step in the hiring process. Our self-screening bundle allows you to check your professional licenses and share it with potential employers. This not only speeds up the hiring process but also builds trust with your future employer.',
+      'buttonText': 'Get Bundle',
+      'price': 33.00,
+      'required_documents': [
+        {
+          'service': 'Professional Licenses',
+          'documents': ['License Verification', 'Disciplinary Actions Report']
+        },
+      ],
+    },
+    {
+      'title': 'Credit Report Bundle',
+      'description':
+          'Credit reports are a crucial step in the hiring process. Our self-screening bundle allows you to check your credit report and share it with potential employers. This not only speeds up the hiring process but also builds trust with your future employer.',
+      'buttonText': 'Get Bundle',
+      'price': 30.00,
+      'required_documents': [
+        {
+          'service': 'Credit Report',
+          'documents': ['Full Credit Report from Major Bureaus']
+        },
+      ],
+    },
+    {
+      'title': 'Bankruptcy Check Bundle',
+      'description':
+          'Bankruptcy checks are a crucial step in the hiring process. Our self-screening bundle allows you to check your bankruptcy history and share it with potential employers. This not only speeds up the hiring process and also builds trust with your future employer.',
+      'buttonText': 'Get Bundle',
+      'price': 20.00,
+      'required_documents': [
+        {
+          'service': 'Bankruptcy Filings',
+          'documents': ['Bankruptcy Court Records']
+        },
+      ],
+    },
+    {
+      'title': 'Civil Records Check Bundle',
+      'description':
+          'Civil records checks are a crucial step in the hiring process. Our self-screening bundle allows you to check your civil records and share it with potential employers. This not only speeds up the hiring process and also builds trust with your future employer.',
+      'buttonText': 'Get Bundle',
+      'price': 25.00,
+      'required_documents': [
+        {
+          'service': 'Civil Court Records',
+          'documents': ['Civil Litigation History', 'Small Claims Records']
+        },
+      ],
+    },
+    // Add more bundles as needed
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    final double screenWidth = MediaQuery.of(context).size.width;
+
+    // Determine crossAxisCount for GridView based on screen width
+    int crossAxisCount;
+    if (screenWidth > 1200) {
+      crossAxisCount = 4;
+    } else if (screenWidth > 700) {
+      crossAxisCount = 2;
+    } else {
+      crossAxisCount = 1;
+    }
+
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text(
+          'Self-Screening Bundles',
+          style: TextStyle(color: Colors.black),
+        ),
+        backgroundColor: Colors.white,
+        elevation: 0,
+        iconTheme:
+            const IconThemeData(color: Colors.black), // Back button color
+      ),
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(40.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text(
+                'Our self-screening bundles',
+                style: TextStyle(
+                  fontSize: 40,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black87,
+                ),
+              ),
+              const SizedBox(height: 40),
+              GridView.builder(
+                shrinkWrap:
+                    true, // Important to make GridView work inside SingleChildScrollView
+                physics:
+                    const NeverScrollableScrollPhysics(), // Disable GridView's own scrolling
+                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: crossAxisCount,
+                  crossAxisSpacing: 30.0,
+                  mainAxisSpacing: 30.0,
+                  childAspectRatio: screenWidth > 700
+                      ? 1.2
+                      : 1.0, // Adjusted aspect ratio for better card height
+                ),
+                itemCount: bundles.length,
+                itemBuilder: (context, index) {
+                  final bundle = bundles[index];
+                  return _buildBundleCard(context, bundle); // Pass context here
+                },
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  // Helper method to build a single bundle card
+  Widget _buildBundleCard(BuildContext context, Map<String, dynamic> bundle) {
+    return Card(
+      elevation: 4,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(30.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              bundle['title']!,
+              style: const TextStyle(
+                fontSize: 22,
+                fontWeight: FontWeight.bold,
+                color: Colors.black87,
+              ),
+            ),
+            const SizedBox(height: 15),
+            Expanded(
+              // Use Expanded to ensure description takes available space
+              child: Text(
+                bundle['description']!,
+                style: const TextStyle(
+                  fontSize: 16,
+                  color: Colors.black54,
+                ),
+              ),
+            ),
+            const SizedBox(height: 15), // Reduced SizedBox height
+            ElevatedButton(
+              onPressed: () {
+                debugPrint('${bundle['title']} - Get Bundle tapped');
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => PaymentPage(bundle: bundle),
+                  ),
+                );
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.black,
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 30, vertical: 15),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+              ),
+              child: Text(
+                bundle['buttonText']!,
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+// New Payment Page
+class PaymentPage extends StatelessWidget {
+  final Map<String, dynamic> bundle;
+
+  const PaymentPage({super.key, required this.bundle});
+
+  @override
+  Widget build(BuildContext context) {
+    final double screenWidth = MediaQuery.of(context).size.width;
+    final bool isLargeScreen = screenWidth > 900;
+
+    // Dummy values for payment summary
+    final double subtotal = bundle['price'] ?? 0.0;
+    const double shipping = 7.24;
+    const double taxRate = 0.045; // Example tax rate
+    final double taxes = subtotal * taxRate;
+    final double total = subtotal + shipping + taxes;
+
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(
+          bundle['title']!, // Heading as selected bundle name
+          style: const TextStyle(color: Colors.black),
+        ),
+        backgroundColor: Colors.white,
+        elevation: 0,
+        iconTheme:
+            const IconThemeData(color: Colors.black), // Back button color
+      ),
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: EdgeInsets.symmetric(
+            horizontal: isLargeScreen ? 100.0 : 20.0,
+            vertical: 40.0,
+          ),
+          child: Flex(
+            direction: isLargeScreen ? Axis.horizontal : Axis.vertical,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Left Section: Bundle Details and Checks
+              Expanded(
+                flex: 3,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      'You are completing a purchase from affinidi.com', // Changed from cross-checks.com
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: Colors.black54,
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+                    Text(
+                      bundle['title']!,
+                      style: TextStyle(
+                        fontSize: isLargeScreen ? 32 : 24,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black87,
+                      ),
+                    ),
+                    const SizedBox(height: 15),
+                    Text(
+                      bundle['description']!,
+                      style: const TextStyle(
+                        fontSize: 16,
+                        color: Colors.black54,
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+                    if (bundle['required_documents'] != null &&
+                        bundle['required_documents'].isNotEmpty) ...[
+                      const Text(
+                        'Included in this bundle are the following checks:',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.black87,
+                        ),
+                      ),
+                      const SizedBox(height: 10),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: (bundle['required_documents']
+                                as List<Map<String, dynamic>>)
+                            .map((serviceData) => Padding(
+                                  padding: const EdgeInsets.only(bottom: 5.0),
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        '• ${serviceData['service']}',
+                                        style: const TextStyle(
+                                            fontSize: 16,
+                                            color: Colors.black54,
+                                            fontWeight: FontWeight.bold),
+                                      ),
+                                      if (serviceData['documents'] != null &&
+                                          serviceData['documents'].isNotEmpty)
+                                        Padding(
+                                          padding:
+                                              const EdgeInsets.only(left: 20.0),
+                                          child: Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: (serviceData['documents']
+                                                    as List<String>)
+                                                .map((doc) => Text(
+                                                      '  - $doc',
+                                                      style: const TextStyle(
+                                                          fontSize: 15,
+                                                          color:
+                                                              Colors.black54),
+                                                    ))
+                                                .toList(),
+                                          ),
+                                        ),
+                                    ],
+                                  ),
+                                ))
+                            .toList(),
+                      ),
+                    ],
+                  ],
+                ),
+              ),
+              SizedBox(
+                  width: isLargeScreen ? 80 : 0,
+                  height: isLargeScreen ? 0 : 40),
+              // Right Section: Order Summary
+              Expanded(
+                flex: 2,
+                child: Container(
+                  padding: const EdgeInsets.all(30.0),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(12),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.grey.withOpacity(0.1),
+                        spreadRadius: 2,
+                        blurRadius: 5,
+                        offset: const Offset(0, 3),
+                      ),
+                    ],
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            'Order Summary',
+                            style: TextStyle(
+                              fontSize: isLargeScreen ? 24 : 20,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.black87,
+                            ),
+                          ),
+                          // Dummy Stripe logo placeholder
+                          const Text(
+                            'Powered by Stripe',
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: Colors.grey,
+                              fontStyle: FontStyle.italic,
+                            ),
+                          ),
+                        ],
+                      ),
+                      const Divider(height: 30),
+                      Row(
+                        children: [
+                          Container(
+                            width: 50,
+                            height: 50,
+                            decoration: BoxDecoration(
+                              color: Colors.grey[200],
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: const Icon(Icons.description,
+                                color: Colors.grey), // Placeholder icon
+                          ),
+                          const SizedBox(width: 15),
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const Text(
+                                'Self-Screening',
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                              Text(
+                                bundle['title']!,
+                                style: const TextStyle(
+                                    fontSize: 14, color: Colors.black54),
+                              ),
+                            ],
+                          ),
+                          const Spacer(),
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.end,
+                            children: [
+                              Text(
+                                '\$${subtotal.toStringAsFixed(2)}',
+                                style: const TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                              const Text(
+                                'Qty: 1',
+                                style: TextStyle(
+                                    fontSize: 14, color: Colors.black54),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 20),
+                      TextField(
+                        decoration: InputDecoration(
+                          hintText: 'Gift or discount code',
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8),
+                            borderSide: BorderSide.none,
+                          ),
+                          filled: true,
+                          fillColor: Colors.grey[100],
+                          contentPadding: const EdgeInsets.symmetric(
+                              horizontal: 15, vertical: 10),
+                          suffixIcon: TextButton(
+                            onPressed: () {
+                              debugPrint('Apply button tapped');
+                            },
+                            child: const Text('Apply',
+                                style: TextStyle(color: Colors.black)),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 30),
+                      _buildPaymentSummaryRow(
+                          'Subtotal', '\$${subtotal.toStringAsFixed(2)}'),
+                      const SizedBox(height: 10),
+                      _buildPaymentSummaryRow(
+                          'Shipping', '\$${shipping.toStringAsFixed(2)}'),
+                      const Divider(height: 30),
+                      _buildPaymentSummaryRow(
+                          'Total', '\$${total.toStringAsFixed(2)}',
+                          isTotal: true),
+                      const SizedBox(height: 5),
+                      Text(
+                        'Including \$${taxes.toStringAsFixed(2)} in taxes',
+                        style: const TextStyle(
+                            fontSize: 14, color: Colors.black54),
+                      ),
+                      const SizedBox(height: 30),
+                      SizedBox(
+                        width: double.infinity,
+                        child: ElevatedButton(
+                          onPressed: () {
+                            debugPrint(
+                                'Pay \$${total.toStringAsFixed(2)} tapped');
+                            // Navigate to PaymentConfirmationPage
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => PaymentConfirmationPage(
+                                    bundle: bundle), // Pass the entire bundle
+                              ),
+                            );
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.black,
+                            padding: const EdgeInsets.symmetric(vertical: 20),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                          ),
+                          child: Text(
+                            'Pay \$${total.toStringAsFixed(2)}',
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 18,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 20),
+                      const Text(
+                        'Your personal data will be used to process your order, support your experience throughout this website, and for other purposes described in our privacy policy.',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(fontSize: 12, color: Colors.black54),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  // Helper method for payment summary rows
+  Widget _buildPaymentSummaryRow(String label, String value,
+      {bool isTotal = false}) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Text(
+          label,
+          style: TextStyle(
+            fontSize: isTotal ? 24 : 16,
+            fontWeight: isTotal ? FontWeight.bold : FontWeight.normal,
+            color: Colors.black87,
+          ),
+        ),
+        Text(
+          value,
+          style: TextStyle(
+            fontSize: isTotal ? 24 : 16,
+            fontWeight: isTotal ? FontWeight.bold : FontWeight.normal,
+            color: Colors.black87,
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+// New Payment Confirmation Page
+class PaymentConfirmationPage extends StatelessWidget {
+  final Map<String, dynamic> bundle; // Now accepts the whole bundle
+
+  const PaymentConfirmationPage({super.key, required this.bundle});
+
+  @override
+  Widget build(BuildContext context) {
+    final double screenWidth = MediaQuery.of(context).size.width;
+    final bool isLargeScreen = screenWidth > 900;
+
+    return Scaffold(
+      appBar: AppBar(
+        backgroundColor: Colors.white,
+        elevation: 0,
+        iconTheme:
+            const IconThemeData(color: Colors.black), // Back button color
+      ),
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: EdgeInsets.symmetric(
+            horizontal: isLargeScreen ? 100.0 : 20.0,
+            vertical: 40.0,
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Text(
+                    'Payment Successful',
+                    style: TextStyle(
+                      fontSize: isLargeScreen ? 40 : 32,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black87,
+                    ),
+                  ),
+                  const SizedBox(width: 10),
+                  Text(
+                    '🎉', // Party popper emoji
+                    style: TextStyle(fontSize: isLargeScreen ? 40 : 32),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 20),
+              Text(
+                'Thank you for purchasing the ${bundle['title']!} and taking the first step toward your background verification!',
+                style: TextStyle(
+                  fontSize: isLargeScreen ? 18 : 16,
+                  color: Colors.black87,
+                ),
+              ),
+              const SizedBox(height: 15),
+              Text(
+                'Check the list of required documents and gather everything you need. When you\'re ready, fill out the self-screening form and upload your documents to initiate the screening process.',
+                style: TextStyle(
+                  fontSize: isLargeScreen ? 18 : 16,
+                  color: Colors.black87,
+                ),
+              ),
+              const SizedBox(height: 15),
+              Text(
+                'If you have any questions or need assistance, our support team is here to help at support@affinidi.com', // Changed from cross-checks.com
+                style: TextStyle(
+                  fontSize: isLargeScreen ? 18 : 16,
+                  color: Colors.black87,
+                ),
+              ),
+              const SizedBox(height: 40),
+              // List of documents required (ExpansionTile)
+              Card(
+                elevation: 2,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: ExpansionTile(
+                  leading: const Icon(Icons.info_outline, color: Colors.black),
+                  title: const Text(
+                    'List of documents required',
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.black87,
+                    ),
+                  ),
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: Column(
+                        crossAxisAlignment:
+                            CrossAxisAlignment.start, // Left-align content
+                        children: (bundle['required_documents']
+                                    as List<Map<String, dynamic>>?)
+                                ?.expand((serviceData) => [
+                                      Text('• ${serviceData['service']}',
+                                          textAlign: TextAlign.left,
+                                          style: const TextStyle(
+                                              fontSize: 16,
+                                              color: Colors.black54,
+                                              fontWeight: FontWeight.bold)),
+                                      if (serviceData['documents'] != null &&
+                                          serviceData['documents'].isNotEmpty)
+                                        Padding(
+                                          padding:
+                                              const EdgeInsets.only(left: 20.0),
+                                          child: Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: (serviceData['documents']
+                                                    as List<String>)
+                                                .map((doc) => Text(
+                                                      '  - $doc',
+                                                      textAlign: TextAlign.left,
+                                                      style: const TextStyle(
+                                                          fontSize: 15,
+                                                          color:
+                                                              Colors.black54),
+                                                    ))
+                                                .toList(),
+                                          ),
+                                        ),
+                                      const SizedBox(
+                                          height:
+                                              5), // Spacing between services
+                                    ])
+                                .toList() ??
+                            [
+                              const Text(
+                                  'No specific documents listed for this bundle.')
+                            ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 40),
+              // Adjusted size and alignment for "Start Your Self-Screening" button
+              Align(
+                alignment: Alignment.centerLeft, // Left-align the button
+                child: ElevatedButton(
+                  onPressed: () {
+                    debugPrint('Start Your Self-Screening tapped');
+                    // Navigate to SelfScreeningFormPage, passing required_documents
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => SelfScreeningFormPage(
+                          requiredDocuments: bundle['required_documents']
+                              as List<Map<String, dynamic>>?,
+                        ),
+                      ),
+                    );
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.black,
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 30,
+                        vertical: 15), // Adjusted padding for smaller size
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                  ),
+                  child: Text(
+                    'Start Your Self-Screening',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: isLargeScreen ? 16 : 14, // Adjusted font size
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+// New Self-Screening Form Page
+class SelfScreeningFormPage extends StatefulWidget {
+  final List<Map<String, dynamic>>? requiredDocuments; // New parameter
+
+  const SelfScreeningFormPage({super.key, this.requiredDocuments});
+
+  @override
+  State<SelfScreeningFormPage> createState() => _SelfScreeningFormPageState();
+}
+
+class _SelfScreeningFormPageState extends State<SelfScreeningFormPage> {
+  int _currentStep =
+      0; // 0 for Enter Details, 1 for Upload Documents, 2 for Start Screening
+  List<String> _selectedFiles = []; // State to hold dummy selected file names
+
+  // Method to simulate file picking
+  void _pickFiles() async {
+    // In a real Flutter app, you would use file_picker here:
+    // FilePickerResult? result = await FilePicker.platform.pickFiles(allowMultiple: true);
+    // if (result != null) {
+    //   setState(() {
+    //     _selectedFiles = result.files.map((file) => file.name).toList();
+    //   });
+    // } else {
+    //   // User canceled the picker
+    // }
+
+    // For demonstration in Canvas, add a dummy file
+    setState(() {
+      _selectedFiles.add('dummy_document_${(_selectedFiles.length + 1)}.pdf');
+    });
+    debugPrint('Simulated file pick: $_selectedFiles');
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final double screenWidth = MediaQuery.of(context).size.width;
+    final bool isLargeScreen = screenWidth > 900;
+
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text(
+          'Self-Screening Form',
+          style: TextStyle(color: Colors.black),
+        ),
+        backgroundColor: Colors.white,
+        elevation: 0,
+        iconTheme:
+            const IconThemeData(color: Colors.black), // Back button color
+      ),
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: EdgeInsets.symmetric(
+            horizontal: isLargeScreen ? 100.0 : 20.0,
+            vertical: 40.0,
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Self-Screening Form',
+                style: TextStyle(
+                  fontSize: isLargeScreen ? 40 : 32,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black87,
+                ),
+              ),
+              const SizedBox(height: 30),
+              // Progress indicators
+              Row(
+                children: [
+                  _buildProgressStep(
+                      '1', 'Enter Your Details', _currentStep == 0),
+                  _buildProgressConnector(),
+                  _buildProgressStep(
+                      '2', 'Upload Documents', _currentStep == 1),
+                  _buildProgressConnector(),
+                  _buildProgressStep('3', 'Start Screening', _currentStep == 2),
+                ],
+              ),
+              const SizedBox(height: 40),
+              // Conditional rendering based on current step
+              if (_currentStep == 0) ...[
+                // Scan ID & Fill Data Section
+                Text(
+                  'Scan ID & Fill Data',
+                  style: TextStyle(
+                    fontSize: isLargeScreen ? 24 : 20,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black87,
+                  ),
+                ),
+                const SizedBox(height: 20),
+                Container(
+                  padding: const EdgeInsets.all(20),
+                  decoration: BoxDecoration(
+                    color: Colors.grey[100],
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          const Icon(Icons.credit_card,
+                              size: 40,
+                              color: Colors.black54), // Placeholder icon
+                          const SizedBox(width: 15),
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: const [
+                              Text(
+                                'Accepted forms of ID',
+                                style: TextStyle(
+                                    fontSize: 16, fontWeight: FontWeight.w600),
+                              ),
+                              Text('• Passport',
+                                  style: TextStyle(
+                                      fontSize: 14, color: Colors.black54)),
+                              Text('• NCSBN ID',
+                                  style: TextStyle(
+                                      fontSize: 14, color: Colors.black54)),
+                            ],
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 20),
+                      SizedBox(
+                        width: isLargeScreen
+                            ? 200
+                            : double.infinity, // Responsive width
+                        child: ElevatedButton(
+                          onPressed: () {
+                            debugPrint('Scan & Fill Data tapped');
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.black,
+                            padding: const EdgeInsets.symmetric(vertical: 15),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                          ),
+                          child: const Text(
+                            'Scan & Fill Data',
+                            style: TextStyle(color: Colors.white, fontSize: 16),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 40),
+                // OR separator
+                Center(
+                  child: Text(
+                    'OR',
+                    style: TextStyle(
+                      fontSize: isLargeScreen ? 18 : 16,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black54,
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 40),
+                // Manually Fill Section
+                Text(
+                  'Manually Fill',
+                  style: TextStyle(
+                    fontSize: isLargeScreen ? 24 : 20,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black87,
+                  ),
+                ),
+                const SizedBox(height: 20),
+                _buildTextField('Full Name', 'Enter full name'),
+                const SizedBox(height: 20),
+                _buildTextField('Date of Birth', 'Enter date of birth'),
+                const SizedBox(height: 20),
+                _buildTextField('Social Security Number (SSN)',
+                    'Enter SSN'), // Changed hint text
+                const SizedBox(height: 40),
+                // Continue Button
+                Align(
+                  alignment: Alignment.centerLeft, // Left-align the button
+                  child: ElevatedButton(
+                    onPressed: () {
+                      setState(() {
+                        _currentStep = 1; // Move to Upload Documents step
+                      });
+                      debugPrint('Continue button tapped');
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.black,
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 30, vertical: 15), // Small size
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                    ),
+                    child: const Text(
+                      'Continue',
+                      style: TextStyle(color: Colors.white, fontSize: 16),
+                    ),
+                  ),
+                ),
+              ] else if (_currentStep == 1) ...[
+                // Upload Documents Section
+                Text(
+                  'Upload your documents, and we\'ll automatically detect which service they belong to. If any files go unidentified, you\'ll find them under Unidentified Documents, where you can manually drag and drop them to the respective service.',
+                  style: TextStyle(
+                    fontSize: isLargeScreen ? 16 : 14,
+                    color: Colors.black54,
+                  ),
+                ),
+                const SizedBox(height: 20),
+                Container(
+                  padding: const EdgeInsets.all(15),
+                  decoration: BoxDecoration(
+                    color: Colors.blue[50],
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Row(
+                    children: const [
+                      Icon(Icons.info_outline, color: Colors.blue),
+                      SizedBox(width: 10),
+                      Expanded(
+                        child: Text(
+                          'You can upload documents asynchronously within 4 days as your screening progresses. Submit at least one document to start the screening.',
+                          style:
+                              TextStyle(fontSize: 14, color: Colors.blueGrey),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 40),
+                Flex(
+                  direction: isLargeScreen ? Axis.horizontal : Axis.vertical,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Your Services (Checks) Section
+                    Expanded(
+                      flex: 3,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Your Services',
+                            style: TextStyle(
+                              fontSize: isLargeScreen ? 24 : 20,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.black87,
+                            ),
+                          ),
+                          const SizedBox(height: 20),
+                          // Dynamically list service checks based on requiredDocuments
+                          if (widget.requiredDocuments != null &&
+                              widget.requiredDocuments!.isNotEmpty)
+                            ...widget.requiredDocuments!.map((serviceData) {
+                              return Padding(
+                                padding: const EdgeInsets.only(bottom: 20.0),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      serviceData['service']!,
+                                      style: const TextStyle(
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.w600,
+                                        color: Colors.black87,
+                                      ),
+                                    ),
+                                    const Text(
+                                      'Waiting for upload', // Status
+                                      style: TextStyle(
+                                        fontSize: 14,
+                                        fontStyle: FontStyle.italic,
+                                        color: Colors.grey,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 10),
+                                    Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: (serviceData['documents']
+                                              as List<String>)
+                                          .map((doc) => Padding(
+                                                padding: const EdgeInsets.only(
+                                                    bottom: 5.0),
+                                                child: Row(
+                                                  children: [
+                                                    Icon(Icons.radio_button_off,
+                                                        size: 18,
+                                                        color: Colors.grey[
+                                                            400]), // Placeholder for checkbox/radio
+                                                    const SizedBox(width: 8),
+                                                    Text(
+                                                      doc,
+                                                      style: const TextStyle(
+                                                          fontSize: 16,
+                                                          color:
+                                                              Colors.black54),
+                                                    ),
+                                                  ],
+                                                ),
+                                              ))
+                                          .toList(),
+                                    ),
+                                  ],
+                                ),
+                              );
+                            }).toList()
+                          else
+                            const Text(
+                              'No specific documents required for this bundle.',
+                              style: TextStyle(
+                                  fontSize: 16, color: Colors.black54),
+                            ),
+                        ],
+                      ),
+                    ),
+                    SizedBox(
+                        width: isLargeScreen ? 80 : 0,
+                        height: isLargeScreen ? 0 : 40),
+                    // Upload Documents Here Section
+                    Expanded(
+                      flex: 2,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Upload Documents Here',
+                            style: TextStyle(
+                              fontSize: isLargeScreen ? 24 : 20,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.black87,
+                            ),
+                          ),
+                          const SizedBox(height: 20),
+                          Container(
+                            height: 300, // Fixed height for the upload area
+                            decoration: BoxDecoration(
+                              color: Colors.grey[50],
+                              borderRadius: BorderRadius.circular(12),
+                              border: Border.all(
+                                  color: Colors.grey[300]!,
+                                  style: BorderStyle.solid),
+                            ),
+                            child: Center(
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: const [
+                                      Icon(Icons.picture_as_pdf,
+                                          size: 40, color: Colors.grey),
+                                      SizedBox(width: 10),
+                                      Icon(Icons.image,
+                                          size: 40, color: Colors.grey),
+                                      SizedBox(width: 10),
+                                      Icon(Icons.insert_drive_file,
+                                          size: 40, color: Colors.grey),
+                                    ],
+                                  ),
+                                  const SizedBox(height: 20),
+                                  const Text(
+                                    'Drag & drop your files here',
+                                    style: TextStyle(
+                                        fontSize: 16, color: Colors.black54),
+                                  ),
+                                  const Text(
+                                    '(PDF, JPG, JPEG, PNG files less than 5MB)',
+                                    style: TextStyle(
+                                        fontSize: 14, color: Colors.grey),
+                                  ),
+                                  const SizedBox(height: 10),
+                                  const Text(
+                                    'OR',
+                                    style: TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.black54),
+                                  ),
+                                  const SizedBox(height: 10),
+                                  ElevatedButton(
+                                    onPressed:
+                                        _pickFiles, // Call the simulated pick files method
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: Colors.black,
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 30, vertical: 15),
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(8),
+                                      ),
+                                    ),
+                                    child: const Text(
+                                      'Browse files',
+                                      style: TextStyle(
+                                          color: Colors.white, fontSize: 16),
+                                    ),
+                                  ),
+                                  // Display selected files
+                                  if (_selectedFiles.isNotEmpty)
+                                    Padding(
+                                      padding: const EdgeInsets.only(top: 20.0),
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          const Text(
+                                            'Selected Files:',
+                                            style: TextStyle(
+                                                fontSize: 14,
+                                                fontWeight: FontWeight.bold),
+                                          ),
+                                          ..._selectedFiles
+                                              .map((fileName) => Text(
+                                                    '- $fileName',
+                                                    style: const TextStyle(
+                                                        fontSize: 14,
+                                                        color: Colors.black54),
+                                                  )),
+                                        ],
+                                      ),
+                                    ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 40),
+                // Submit Button
+                Align(
+                  alignment: Alignment.centerLeft, // Left-align the button
+                  child: ElevatedButton(
+                    onPressed: () {
+                      setState(() {
+                        _currentStep = 2; // Move to Start Screening step
+                      });
+                      debugPrint('Submit button tapped');
+                      // Implement submission logic
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.black,
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 30, vertical: 15), // Small size
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                    ),
+                    child: const Text(
+                      'Submit',
+                      style: TextStyle(color: Colors.white, fontSize: 16),
+                    ),
+                  ),
+                ),
+              ] else if (_currentStep == 2) ...[
+                // Start Screening Confirmation (similar to Payment Successful but for screening start)
+                Text(
+                  'Your Screening Has Started!',
+                  style: TextStyle(
+                    fontSize: isLargeScreen ? 40 : 32,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black87,
+                  ),
+                ),
+                const SizedBox(height: 20),
+                Text(
+                  'Thank you for submitting your documents. Your self-screening process has officially begun. You will be notified of the progress and results via email.',
+                  style: TextStyle(
+                    fontSize: isLargeScreen ? 18 : 16,
+                    color: Colors.black87,
+                  ),
+                ),
+                const SizedBox(height: 40),
+                Align(
+                  alignment: Alignment.centerLeft,
+                  child: ElevatedButton(
+                    onPressed: () {
+                      debugPrint('Back to Home tapped');
+                      Navigator.popUntil(context,
+                          (route) => route.isFirst); // Go back to the home page
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.black,
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 30, vertical: 15),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                    ),
+                    child: const Text(
+                      'Back to Home',
+                      style: TextStyle(color: Colors.white, fontSize: 16),
+                    ),
+                  ),
+                ),
+              ],
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  // Helper method for progress steps
+  Widget _buildProgressStep(String number, String text, bool isActive) {
+    return Column(
+      children: [
+        CircleAvatar(
+          radius: 15,
+          backgroundColor: isActive ? Colors.black : Colors.grey[300],
+          child: Text(
+            number,
+            style: TextStyle(
+              color: isActive ? Colors.white : Colors.black,
+              fontSize: 14,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ),
+        const SizedBox(height: 5),
+        Text(
+          text,
+          style: TextStyle(
+            fontSize: 12,
+            color: isActive ? Colors.black : Colors.grey,
+            fontWeight: isActive ? FontWeight.bold : FontWeight.normal,
+          ),
+        ),
+      ],
+    );
+  }
+
+  // Helper method for progress connector line
+  Widget _buildProgressConnector() {
+    return Expanded(
+      child: Container(
+        height: 2,
+        color: Colors.grey[300],
+        margin: const EdgeInsets.symmetric(horizontal: 10),
+      ),
+    );
+  }
+
+  // Helper method for text input fields
+  Widget _buildTextField(String label, String hintText) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          label,
+          style: const TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.w600,
+            color: Colors.black87,
+          ),
+        ),
+        const SizedBox(height: 8),
+        TextField(
+          key: ValueKey(label), // Added a ValueKey for potential error fix
+          decoration: InputDecoration(
+            hintText: hintText,
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(8),
+              borderSide: const BorderSide(color: Colors.grey),
+            ),
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(8),
+              borderSide: const BorderSide(color: Colors.grey),
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(8),
+              borderSide: const BorderSide(color: Colors.black, width: 2),
+            ),
+            contentPadding:
+                const EdgeInsets.symmetric(horizontal: 15, vertical: 15),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+// New Profile Page
+class ProfilePage extends StatelessWidget {
+  const ProfilePage({super.key});
+
+  // Dummy user details
+  final String userId = 'user_12345_affinidi';
+  final String walletAddress = '0xAbCdEf1234567890AbCdEf1234567890';
+  final String status = 'Active';
+  final String email = 'user.affinidi@example.com';
+
+  @override
+  Widget build(BuildContext context) {
+    final double screenWidth = MediaQuery.of(context).size.width;
+    final bool isLargeScreen = screenWidth > 900;
+
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text(
+          'Your Profile',
+          style: TextStyle(color: Colors.black),
+        ),
+        backgroundColor: Colors.white,
+        elevation: 0,
+        iconTheme:
+            const IconThemeData(color: Colors.black), // Back button color
+      ),
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: EdgeInsets.symmetric(
+            horizontal: isLargeScreen ? 100.0 : 20.0,
+            vertical: 40.0,
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'User Information',
+                style: TextStyle(
+                  fontSize: isLargeScreen ? 40 : 32,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black87,
+                ),
+              ),
+              const SizedBox(height: 30),
+              _buildProfileDetailRow('User ID:', userId, isLargeScreen),
+              _buildProfileDetailRow(
+                  'Wallet Address:', walletAddress, isLargeScreen),
+              _buildProfileDetailRow('Status:', status, isLargeScreen),
+              _buildProfileDetailRow('Email:', email, isLargeScreen),
+              const SizedBox(height: 40),
+              Text(
+                'Additional Details (Simulated)',
+                style: TextStyle(
+                  fontSize: isLargeScreen ? 24 : 20,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black87,
+                ),
+              ),
+              const SizedBox(height: 20),
+              Text(
+                'These details would be populated after your initial setup on the splash screen.',
+                style: TextStyle(
+                  fontSize: isLargeScreen ? 16 : 14,
+                  color: Colors.black54,
+                ),
+              ),
+              const SizedBox(height: 20),
+              // Dummy data for demonstration
+              _buildProfileDetailRow(
+                  'Last Login:', '2025-05-21 15:00:00', isLargeScreen),
+              _buildProfileDetailRow(
+                  'Data Privacy Consent:', 'Granted', isLargeScreen),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildProfileDetailRow(
+      String label, String value, bool isLargeScreen) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8.0),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          SizedBox(
+            width: isLargeScreen ? 180 : 120, // Adjust width for label
+            child: Text(
+              label,
+              style: const TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.w600,
+                color: Colors.black87,
+              ),
+            ),
+          ),
+          Expanded(
+            child: Text(
+              value,
+              style: const TextStyle(
+                fontSize: 16,
+                color: Colors.black54,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
